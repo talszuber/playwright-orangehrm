@@ -31,5 +31,27 @@ export class PersonaIdentificationModule {
         await this.page.getByRole('button', {name: 'Save'}).click();
     }
 
+    async findEmployee(employeeid: string) {
 
-}
+        await this.page.locator('.oxd-input-group', {hasText: 'Employee id'}).getByRole('textbox').fill(employeeid);
+        await this.page.getByRole('button', {name: 'Search'}).click();
+        const row = this.page.locator('.oxd-table-row').filter({has: this.page.getByRole('cell', {name: employeeid})});
+        await expect(row).toBeVisible();
+    }
+
+    async grabFirstEmployeeId() {
+
+        const row = this.page.locator('.oxd-table-row--clickable').first();
+        const string employeeId = await row.getByRole('cell').nth(1).textContent();
+        return employeeId;
+        }
+    async terminateEmployee(employeeid: string) {
+
+        const row = this.page.locator('.oxd-table-row').filter({has: this.page.getByRole('cell', {name: employeeid, exact: true})});
+
+        await row.getByRole('button').locator('.bi-trash').click();
+        await this.page.getByRole('button', {name: ' Yes, Delete '} ).click();
+        await expect(row).toHaveCount(0);
+
+
+    }}   
